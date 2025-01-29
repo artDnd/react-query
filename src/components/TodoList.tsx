@@ -1,21 +1,9 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import styles from "./TodoList.module.scss";
 import TodoItem from "./TodoItem";
-import { todoListApi } from "./api";
-import { useState } from "react";
+import { useTodoList } from "../hooks/use-todo-list";
 
 const TodoList = () => {
-  const [page, setPage] = useState(1);
-  const {
-    data: todoItems,
-    error,
-    isPending,
-  } = useQuery({
-    queryKey: ["tasks", "list", { page }],
-    queryFn: (meta) => todoListApi.getTodoList({ page }, meta),
-    placeholderData: keepPreviousData,
-  });
-
+  const { error, isPending, todoItems, setPage } = useTodoList();
   if (isPending) return <h1>isLoading!</h1>;
   if (error) return <h1>error: {JSON.stringify(error)}</h1>;
   return (
@@ -30,7 +18,7 @@ const TodoList = () => {
         <button>Add</button>
       </div>
       <ul className={styles.ul}>
-        {todoItems.data.map((todo) => (
+        {todoItems?.data.map((todo) => (
           <TodoItem key={todo.id} {...todo} />
         ))}
       </ul>
@@ -38,7 +26,7 @@ const TodoList = () => {
         prev
       </button>
       <button
-        onClick={() => setPage((page) => Math.min(page + 1, todoItems.pages))}
+        onClick={() => setPage((page) => Math.min(page + 1, 10))} // hard
       >
         next
       </button>
